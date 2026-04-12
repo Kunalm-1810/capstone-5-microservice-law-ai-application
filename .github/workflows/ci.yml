@@ -1,0 +1,39 @@
+name: Build the CI job for Indian AI Law project
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build: 
+    runs-on: self-hosted  
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        run: npm install 
+
+      - name: Install backend dependencies
+        run: cd backend && npm install
+
+      - name: Run tests
+        run: CI=true npm test
+
+      - name: Build frontend
+        run: npm run build 
+
+      - name: list all the files and folder in build directory
+        run: ls
+      - name: Upload artifacts check the node js application path
+        uses: actions/upload-artifact@v4
+        with:
+          name: nodejs-app-artifacts
+          path: ./build
