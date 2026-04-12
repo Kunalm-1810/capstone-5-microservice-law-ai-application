@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Know Your Law - India</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>Know Your Law 🇮🇳</h1>
+  <p>Understand Indian Laws in Simple Language</p>
+</header>
+
+<section class="search">
+  <input type="text" id="searchInput" placeholder="Search laws (e.g. FIR, Arrest rights)">
+  <button onclick="searchLaw()">Search</button>
+</section>
+
+<section id="result"></section>
+
+<section class="cards">
+  <div class="card" onclick="showSection('rights')">
+    <h3>Fundamental Rights</h3>
+    <p>Learn your basic rights</p>
+  </div>
+
+  <div class="card" onclick="showSection('criminal')">
+    <h3>Criminal Law</h3>
+    <p>IPC, FIR, Arrest rules</p>
+  </div>
+
+  <div class="card" onclick="showSection('consumer')">
+    <h3>Consumer Rights</h3>
+    <p>File complaints easily</p>
+  </div>
+
+  <div class="card" onclick="showSection('guides')">
+    <h3>Legal Guides</h3>
+    <p>Step-by-step help</p>
+  </div>
+</section>
+
+<section id="content"></section>
+
+<footer>
+  <p>⚠️ This platform provides legal information, not legal advice.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
