@@ -64,7 +64,8 @@ test('switches to review tab and submits contract', async () => {
   fireEvent.change(screen.getByPlaceholderText(/Paste contract text/i), {
     target: { value: 'This is a contract.' },
   });
-  fireEvent.click(screen.getByText(/Review Contract/i, { selector: 'button' }));
+  const reviewButtons = screen.getAllByText(/Review Contract/i);
+  fireEvent.click(reviewButtons[reviewButtons.length - 1]);
 
   await waitFor(() =>
     expect(screen.getByText('Clause 3 is risky.')).toBeInTheDocument()
