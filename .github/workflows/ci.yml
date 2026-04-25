@@ -29,6 +29,9 @@ jobs:
 
       - name: Build frontend
         run: npm run build 
+      
+      - name: Build backend
+        run: cd backend && npm run build
 
       - name: list all the files and folder in build directory
         run: ls
