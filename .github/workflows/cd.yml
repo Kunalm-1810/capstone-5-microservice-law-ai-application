@@ -1,23 +1,23 @@
-name: Deploy the Indian AI Law project
+# name: Deploy the Indian AI Law project
 
-on:
-  workflow_run:
-    workflows: ["Build the CI job for Indian AI Law project"]
-    types:
-      - completed
-    branches:
-      - main
+# on:
+#   workflow_run:
+#     workflows: ["Build the CI job for Indian AI Law project"]
+#     types:
+#       - completed
+#     branches:
+#       - main
 
-jobs:
-  deploy:
-    runs-on: self-hosted
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    steps:
-      - name: Install dependencies
-        run: cd $GITHUB_WORKSPACE && npm install && cd backend && npm install
+# jobs:
+#   deploy:
+#     runs-on: self-hosted
+#     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#     steps:
+#       - name: Install dependencies
+#         run: cd $GITHUB_WORKSPACE && npm install && cd backend && npm install
 
-      - name: Build frontend
-        run: cd $GITHUB_WORKSPACE && npm run build
+#       - name: Build frontend
+#         run: cd $GITHUB_WORKSPACE && npm run build
 
-      - name: Start server with pm2
-        run: cd $GITHUB_WORKSPACE && pm2 restart law-ai || pm2 start backend/server.js --name law-ai
+#       - name: Start server with pm2
+#         run: cd $GITHUB_WORKSPACE && pm2 restart law-ai || pm2 start backend/server.js --name law-ai
