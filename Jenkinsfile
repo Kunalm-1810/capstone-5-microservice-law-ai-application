@@ -17,12 +17,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                dir('frontend') {
-                    bat 'set CI=true && npm test'
-                }
-                dir('backend') {
-                    bat 'npm test'
-                }
+                bat 'cd frontend && set CI=true && npm test && cd ../backend && npm test'
             }
         }
 
