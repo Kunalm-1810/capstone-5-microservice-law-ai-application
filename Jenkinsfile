@@ -86,8 +86,8 @@ pipeline {
                     rm -rf config-repo
                     git clone https://\$GIT_USER:\$GIT_PASS@github.com/${env.GIT_USERNAME}/${env.CONFIG_REPO}.git config-repo
                     cd config-repo
-                    sed -i "s|image: ${env.DOCKER_HUB}/frontend:.*|image: ${env.DOCKER_HUB}/frontend:${env.IMAGE_TAG}|" ansible-helm/Infra/k8s/frontend/deployment.yml
-                    sed -i "s|image: ${env.DOCKER_HUB}/backend:.*|image: ${env.DOCKER_HUB}/backend:${env.IMAGE_TAG}|" ansible-helm/Infra/k8s/backend/deployment.yml
+                    yq e '.spec.template.spec.containers[0].image = "${env.DOCKER_HUB}/frontend:${env.IMAGE_TAG}"' -i ansible-helm/Infra/k8s/frontend/deployment.yml
+                    yq e '.spec.template.spec.containers[0].image = "${env.DOCKER_HUB}/backend:${env.IMAGE_TAG}"' -i ansible-helm/Infra/k8s/backend/deployment.yml
                     git config user.email "jenkins@ci"
                     git config user.name "Jenkins"
                     git add ansible-helm/Infra/k8s/frontend/deployment.yml ansible-helm/Infra/k8s/backend/deployment.yml
