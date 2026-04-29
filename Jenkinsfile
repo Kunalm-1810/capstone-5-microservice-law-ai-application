@@ -10,7 +10,7 @@ pipeline {
         IMAGE_TAG = "v${BUILD_NUMBER}"
         SONAR_PROJECT_KEY = "law-ai"             // replaced with the SonarQube project key
         GIT_USERNAME = "Kunalm-1810"    // replaced with your GitHub username
-        CONFIG_REPO = "k8s-arcgocd-config-repo"            // replaced with  config repo name
+        CONFIG_REPO = "k8s-arcgocd-config-repo"            // replaced with  config repo name-
     }
 
     stages {
