@@ -6,9 +6,11 @@ pipeline {
     }
 
     environment {
-        DOCKER_HUB = "your-dockerhub-username"  // replace with your Docker Hub username
+        DOCKER_HUB = "kunalmane"  // replace with your Docker Hub username
         IMAGE_TAG = "v${BUILD_NUMBER}"
         SONAR_PROJECT_KEY = "law-ai"             // replace with your SonarQube project key
+        GIT_USERNAME = "Kunalm-1810"    // replace with your GitHub username
+        CONFIG_REPO = "law-ai-config"            // replace with your config repo name
     }
 
     stages {
@@ -78,15 +80,15 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-config-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                     sh '''
-                    git clone https://$GIT_USER:$GIT_PASS@github.com/<your-username>/<your-config-repo>.git config-repo
+                    git clone https://$GIT_USER:$GIT_PASS@github.com/$GIT_USERNAME/$CONFIG_REPO.git config-repo
                     cd config-repo
-                    sed -i "s|image: $DOCKER_HUB/frontend:.*|image: $DOCKER_HUB/frontend:$IMAGE_TAG|" frontend-deployment.yaml
-                    sed -i "s|image: $DOCKER_HUB/backend:.*|image: $DOCKER_HUB/backend:$IMAGE_TAG|" backend-deployment.yaml
+                    sed -i "s|image: $DOCKER_HUB/frontend:.*|image: $DOCKER_HUB/frontend:$IMAGE_TAG|" ansible-helm/Infra/k8s/frontend/deployment.yml
+                    sed -i "s|image: $DOCKER_HUB/backend:.*|image: $DOCKER_HUB/backend:$IMAGE_TAG|" ansible-helm/Infra/k8s/backend/deployment.yml
                     git config user.email "jenkins@ci"
                     git config user.name "Jenkins"
-                    git add frontend-deployment.yaml backend-deployment.yaml
+                    git add ansible-helm/Infra/k8s/frontend/deployment.yml ansible-helm/Infra/k8s/backend/deployment.yml
                     git commit -m "Update image tag to $IMAGE_TAG"
-                    git push https://$GIT_USER:$GIT_PASS@github.com/<your-username>/<your-config-repo>.git main
+                    git push https://$GIT_USER:$GIT_PASS@github.com/$GIT_USERNAME/$CONFIG_REPO.git main
                     '''
                 }
             }
