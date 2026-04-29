@@ -92,12 +92,6 @@ pipeline {
         }
 
         stage('Update Config Repo') {
-            when {
-                anyOf {
-                    changeset "frontend/**"
-                    changeset "backend/**"
-                }
-            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-config-repo', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                     sh """
@@ -108,8 +102,7 @@ pipeline {
                     git config user.email "jenkins@ci"
                     git config user.name "Jenkins"
                     git add ansible-helm/Infra/k8s/frontend/deployment.yml ansible-helm/Infra/k8s/backend/deployment.yml
-                    git commit -m "Update image tag to ${env.IMAGE_TAG}" || true
-                    git push https://\$GIT_USER:\$GIT_PASS@github.com/${env.GIT_USERNAME}/${env.CONFIG_REPO}.git main
+                    git commit -m "Update image tag to ${env.IMAGE_TAG}" && git push https://\$GIT_USER:\$GIT_PASS@github.com/${env.GIT_USERNAME}/${env.CONFIG_REPO}.git main || true
                     """
                 }
             }
