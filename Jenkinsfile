@@ -53,12 +53,6 @@ pipeline {
         }
 
         stage('Build Docker Images') {
-            when {
-                anyOf {
-                    changeset "frontend/**"
-                    changeset "backend/**"
-                }
-            }
             parallel {
                 stage('Frontend Image') {
                     steps {
@@ -74,12 +68,6 @@ pipeline {
         }
 
         stage('Push Images') {
-            when {
-                anyOf {
-                    changeset "frontend/**"
-                    changeset "backend/**"
-                }
-            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'jenkins-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
@@ -103,7 +91,8 @@ pipeline {
                     git config user.email "jenkins@ci"
                     git config user.name "Jenkins"
                     git add ansible-helm/Infra/k8s/frontend/deployment.yml ansible-helm/Infra/k8s/backend/deployment.yml
-                    git commit -m "Update image tag to ${env.IMAGE_TAG}" && git push https://\$GIT_USER:\$GIT_PASS@github.com/${env.GIT_USERNAME}/${env.CONFIG_REPO}.git main || true
+                    git commit -m "Update image tag to ${env.IMAGE_TAG}"
+                    git push https://\$GIT_USER:\$GIT_PASS@github.com/${env.GIT_USERNAME}/${env.CONFIG_REPO}.git main
                     """
                 }
             }
