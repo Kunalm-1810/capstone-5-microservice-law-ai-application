@@ -95,6 +95,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-config-repo', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                     sh """
+                    rm -rf config-repo
                     git clone https://\$GIT_USER:\$GIT_PASS@github.com/${env.GIT_USERNAME}/${env.CONFIG_REPO}.git config-repo
                     cd config-repo
                     sed -i "s|image: ${env.DOCKER_HUB}/frontend:.*|image: ${env.DOCKER_HUB}/frontend:${env.IMAGE_TAG}|" ansible-helm/Infra/k8s/frontend/deployment.yml
