@@ -1,10 +1,14 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     environment {
-        DOCKER_HUB = "kunalmane"  // replace with your Docker Hub username
+        DOCKER_HUB = "your-dockerhub-username"  // replace with your Docker Hub username
         IMAGE_TAG = "v${BUILD_NUMBER}"
-        DEPLOY_LOCAL = "true"
+        SONAR_PROJECT_KEY = "law-ai"             // replace with your SonarQube project key
     }
 
     stages {
@@ -17,13 +21,29 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh 'cd frontend && CI=true npm test && cd ../backend && npm test'
+                sh 'cd frontend && CI=true npm run test:coverage'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY'
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
         stage('Build Applications') {
             steps {
-                sh 'cd frontend && npm run build && cd ../backend && npm run build'
+                sh 'cd frontend && npm run build'
             }
         }
 
@@ -42,31 +62,35 @@ pipeline {
             }
         }
 
-        stage('Deploy Containers') {
-            when {
-                expression { return env.DEPLOY_LOCAL == "true" }
-            }
+        stage('Push Images') {
             steps {
-                sh 'docker-compose down && docker-compose up -d'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    docker push $DOCKER_HUB/frontend:$IMAGE_TAG
+                    docker push $DOCKER_HUB/backend:$IMAGE_TAG
+                    '''
+                }
             }
         }
 
-        stage('Smoke Test') {
+        stage('Update Config Repo') {
             steps {
-                sh 'curl -f http://localhost:8090 || exit 1'
+                withCredentials([usernamePassword(credentialsId: 'github-config-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    sh '''
+                    git clone https://$GIT_USER:$GIT_PASS@github.com/<your-username>/<your-config-repo>.git config-repo
+                    cd config-repo
+                    sed -i "s|image: $DOCKER_HUB/frontend:.*|image: $DOCKER_HUB/frontend:$IMAGE_TAG|" frontend-deployment.yaml
+                    sed -i "s|image: $DOCKER_HUB/backend:.*|image: $DOCKER_HUB/backend:$IMAGE_TAG|" backend-deployment.yaml
+                    git config user.email "jenkins@ci"
+                    git config user.name "Jenkins"
+                    git add frontend-deployment.yaml backend-deployment.yaml
+                    git commit -m "Update image tag to $IMAGE_TAG"
+                    git push https://$GIT_USER:$GIT_PASS@github.com/<your-username>/<your-config-repo>.git main
+                    '''
+                }
             }
         }
 
-        // stage('Push Images') {
-        //     steps {
-        //         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-        //             sh '''
-        //             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-        //             docker push $DOCKER_HUB/frontend:$IMAGE_TAG
-        //             docker push $DOCKER_HUB/backend:$IMAGE_TAG
-        //             '''
-        //         }
-        //     }
-        // }
     }
 }
