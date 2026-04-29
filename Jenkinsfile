@@ -69,7 +69,7 @@ pipeline {
 
         stage('Push Images') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'jenkins-dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                     docker push ''' + env.DOCKER_HUB + '''/frontend:''' + env.IMAGE_TAG + '''
@@ -81,7 +81,7 @@ pipeline {
 
         stage('Update Config Repo') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github-config-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'github-config-repo', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                     sh """
                     git clone https://\$GIT_USER:\$GIT_PASS@github.com/${env.GIT_USERNAME}/${env.CONFIG_REPO}.git config-repo
                     cd config-repo
