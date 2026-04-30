@@ -1,4 +1,4 @@
-# ⚖️ Know Your Law AI — 3-Tier DevSecOps Project
+# ⚖️ Know Your Law AI — 3-Tier DevOps Project
 
 A full-stack AI-powered Indian Legal Assistant built with React, Node.js, and MongoDB — deployed on Kubernetes using a complete CI/CD pipeline with Jenkins, SonarQube, Docker, ArgoCD, and GitHub Webhooks.
 
